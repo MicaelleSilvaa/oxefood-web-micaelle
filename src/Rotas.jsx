@@ -1,11 +1,15 @@
 import React from 'react';
 import { Route, Routes } from "react-router-dom";
 
-import FormCliente from './views/cliente/formCliente';
-import ListCliente from './views/cliente/listCliente';
+import FormCliente from './views/cliente/FormCliente';
+import ListCliente from './views/cliente/ListCliente';
 import FormEntregador from './views/entregador/FormEntregador';
+import ListEntregador from './views/entregador/ListEntregador';
+import ListProduto from './views/produto/ListProduto';
 import Home from './views/home/Home';
-import FormProduto from './views/produto/formProduto'
+import FormProduto from './views/produto/FormProduto';
+import FormMaterial from './views/material/FormMaterial';
+import ListMaterial from './views/material/ListMaterial';
 
 
 function Rotas() {
@@ -15,11 +19,18 @@ function Rotas() {
                 <Route path="/" element={ <Home/> } />
                 <Route path="list-cliente" element={ <ListCliente/> } />
                 <Route path="form-cliente" element={ <FormCliente/> } />
+                <Route path="list-produto" element={ <ListProduto/> } />
                 <Route path="form-produto" element={ <FormProduto/> } />
+                <Route path="list-entregador" element={ <ListEntregador/> } />
                 <Route path="form-entregador" element={ <FormEntregador/> } />
+                <Route path="form-material" element={ <FormMaterial/>} />
+                <Route path="list-material" element={ <ListMaterial/> } />
+                
+               
             </Routes>
         </>
     )
 }
+
 
 export default Rotas

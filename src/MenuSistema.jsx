@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Menu } from "semantic-ui-react";
 
-
 class MenuSistema extends React.Component{
 
    state = {
@@ -22,36 +21,49 @@ class MenuSistema extends React.Component{
                        onClick={this.handleItemClick}
                        as={Link}
                        to='/'
+
                    />
-                    <Menu.Item
+                  
+      
+                  <Menu.Item
                        name='cliente'
                        active={this.state.activeItem === 'cliente'}
                        onClick={this.handleItemClick}
                        as={Link}
                        to='/list-cliente'
-
                    />
+
 
                    <Menu.Item
                        name='produto'
                        active={this.state.activeItem === 'produto'}
                        onClick={this.handleItemClick}
                        as={Link}
-                       to='/form-produto'
+                       to='/list-produto'
                    />
+
 
                    <Menu.Item
                        name='entregador'
                        active={this.state.activeItem === 'entregador'}
                        onClick={this.handleItemClick}
                        as={Link}
-                       to='/form-entregador'
+                       to='/list-entregador'
                    />
+
+                   
+                    <Menu.Item
+                       name='material'
+                       active={this.state.activeItem === 'material'}
+                       onClick={this.handleItemClick}
+                       as={Link}
+                       to='/list-material'
+                   />
+
 
                </Menu>
            </>
        )
    }
 }
-
 export default MenuSistema;
