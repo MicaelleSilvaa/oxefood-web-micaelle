@@ -1,56 +1,105 @@
 import axios from "axios";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import InputMask from 'react-input-mask';
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button, Container, Divider, Form, Icon } from 'semantic-ui-react';
+import { ENDERECO_SERVIDOR } from '../../util/Constantes';
 
-class FormMaterial extends React.Component{
 
-	state = {
+export default function FormMaterial (){
 
-		titulo: null,
-		valor: null,
-		responsavel: null,
-		localizacao: null,
-		peso: null,
-        dataAquisicao: null
-	}
-	salvar = () => {
+	const {state} = useLocation();
+
+	const [titulo, setTitulo] = useState();
+	const[valor, setValor] = useState();
+	const[responsavel, setResponsavel] = useState();
+	const[localizacao, setLocalizacao] = useState();
+	const[peso, setPeso] = useState();
+	const[dataAquisicao, setDataAquisicao] = useState();
+	
+
+	useEffect(() => {
+		
+		if (state != null && state.id != null) {
+
+			axios.get(ENDERECO_SERVIDOR + '/api/material/'+state.id)
+			.then((response) => {
+
+				console.log('response.data.nome: ',response.data.nome)
+				
+				setTitulo(response.data.titulo)
+				setValor(response.data.valor)
+				setResponsavel(response.data.responsavel)
+				setLocalizacao(formatarData(response.data.localizacao))
+				setPeso(response.data.peso)
+				setDataAquisicao(response.data.dataAquisicao)
+			})
+		}
+		
+	}, [state])
+
+	function formatarData(dataParam) {
+
+        if (dataParam == null || dataParam == '') {
+            return ''
+        }
+        
+        let dia = dataParam.substr(8,2);
+        let mes = dataParam.substr(5,2);
+        let ano = dataParam.substr(0,4);
+        let dataFormatada = dia + '/' + mes + '/' + ano;
+
+        return dataFormatada
+    }
+
+	function salvar() {
 
 		let materialRequest = {
 
-			titulo: this.state.titulo,
-			valor: this.state.valor,
-			responsavel: this.state.responsavel,
-			localizacao: this.state.localizacao,
-			peso: this.state.peso,
-            dataAquisicao: this.state.dataAquisicao
-
+			titulo: titulo,
+			valor: valor,
+			responsavel: responsavel,
+			localizacao: localizacao,
+			peso: peso,
+			dataAquisicao: dataAquisicao
 		}
-	
-		axios.post("http://localhost:8082/api/material", materialRequest)
-		.then((response) => {
-			console.log('Material cadastrado com sucesso.')
-		})
-		.catch((error) => {
-			console.log('Erro ao incluir o um material.')
-		})
-	}
 
+		if (idMaterial != null) { //Alteração:
+
+			axios.put(ENDERECO_SERVIDOR + "/api/material/" + idMaterial, MaterialRequest)
+			.then((response) => { console.log('Material alterado com sucesso.') })
+			.catch((error) => { console.log('Erro ao alter um material.') })
+			
+		} else { //Cadastro:
+
+			axios.post(ENDERECO_SERVIDOR + "/api/material", MaterialRequest)
+			.then((response) => { console.log('Material cadastrado com sucesso.') })
+			.catch((error) => { console.log('Erro ao incluir o material.') })
+		}
  
-    render(){
+	}
+	
+
+	//
+   
         return(
-            <div>
+			<div>
 
-                <div style={{marginTop: '3%'}}>
+			<div style={{marginTop: '3%'}}>
 
-                    <Container textAlign='justified' >
+				<Container textAlign='justified' >
 
-                        <h2> <span style={{color: 'darkgray'}}> Material &nbsp;<Icon name='angle double right' size="small" /> </span> Cadastro </h2>
+				{ idMaterial === undefined &&
+					<h2> <span style={{color: 'darkgray'}}> Material &nbsp;<Icon name='angle double right' size="small" /> </span> Cadastro</h2>
+				}
+				{ idMaterial != undefined &&
+					<h2> <span style={{color: 'darkgray'}}> Material &nbsp;<Icon name='angle double right' size="small" /> </span> Alteração</h2>
+				}
 
-                        <Divider />
 
-						<div style={{marginTop: '4%'}}>
+					<Divider />
+
+					<div style={{marginTop: '4%'}}>
 
 							<Form>
 
@@ -61,8 +110,8 @@ class FormMaterial extends React.Component{
 										fluid
 										label='Título'
 										maxLength="100"
-										value={this.state.titulo}
-										onChange={e => this.setState({titulo: e.target.value})}
+										value={titulo}
+										onChange={e => setTitulo(e.target.value)}
 									/>
 
 									<Form.Input
@@ -71,16 +120,17 @@ class FormMaterial extends React.Component{
                                         width={6}>
 										<InputMask 
 										mask="9.99"
-										value={this.state.valor}
-										onChange={e => this.setState({valor: e.target.value})}/> 
+										value={valor}
+										onChange={e => setValor(e.target.value)}/> 
+
 									</Form.Input>
 
                                     <Form.Input
 										fluid
 										label='Responsável'
                                         width={10}
-										value={this.state.responsavel}
-										onChange={e => this.setState({responsavel: e.target.value})}>
+										value={responsavel}
+										onChange={e => setResponsavel(e.target.value)}>
 									</Form.Input>
 
 								</Form.Group>
@@ -93,8 +143,8 @@ class FormMaterial extends React.Component{
 										fluid
 										label='Localização'
                                         width={6}
-										value={this.state.localizacao}
-										onChange={e => this.setState({localizacao: e.target.value})}>
+										value={localizacao}
+										onChange={e => setLocalizacao(e.target.value)}>
 									</Form.Input>
 
                                     
@@ -105,8 +155,8 @@ class FormMaterial extends React.Component{
 										<InputMask 
 										mask="9.99"
                                         placeholder="Ex: 10.00 kg"
-										value={this.state.peso}
-										onChange={e => this.setState({peso: e.target.value})}/> 
+										value={peso}
+										onChange={e => this.setPeso(e.target.value)}/> 
 									</Form.Input>
 
                                     <Form.Input
@@ -119,8 +169,8 @@ class FormMaterial extends React.Component{
                                             mask="99/99/9999" 
                                             maskChar={null}
                                             placeholder="Ex: 20/03/1985"
-											value={this.state.dataAquisicao}
-										onChange={e => this.setState({dataAquisicao: e.target.value})}
+											value={dataAquisicao}
+										onChange={e => setDataAquisicao(e.target.value)}
                                         /> 
                                     </Form.Input>
 
@@ -143,14 +193,14 @@ class FormMaterial extends React.Component{
 
 									<Container textAlign='right'>
 										
-										<Button
+									<Button
 											inverted
 											circular
 											icon
 											labelPosition='left'
 											color='blue'
 											floated='right'
-											onClick={this.salvar}
+											onClick={() => salvar()}
 										>
 											<Icon name='save' />
 											Salvar
@@ -167,6 +217,3 @@ class FormMaterial extends React.Component{
 			</div>
 		)
 	}
-}
-
-export default FormMaterial;
