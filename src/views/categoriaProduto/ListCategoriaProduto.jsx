@@ -1,170 +1,147 @@
 import axios from 'axios';
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Button, Container, Divider, Icon, Table, Modal, Header } from 'semantic-ui-react';
-import { ENDERECO_SERVIDOR } from '../../util/Constantes';
+import { Button, Container, Divider, Header, Icon, Modal, Table } from 'semantic-ui-react';
 
-class ListCategoriaProduto extends React.Component {
+export default function ListCategoriaProduto () {
 
-    state = {
-        openModal: false,
-        idRemover: null,
-        listaCategoriaProduto: []
+    const [lista, setLista] = useState();
+    const [openModal, setOpenModal] = useState(false);
+    const [idRemover, setIdRemover] = useState();
+
+    useEffect(() => {
+
+        carregarLista();
+        
+    }, [])
+
+    function carregarLista () {
+
+        axios.get("http://localhost:8082/api/categoriaproduto/")
+        .then((response) => {
+            setLista(response.data)
+        })
 
     }
 
-    componentDidMount = () => {
+    function confirmaRemover(id) {
 
-        this.carregarLista();
-
+        setOpenModal(true)
+        setIdRemover(id)
     }
-    carregarLista = () => {
 
-        axios.get(ENDERECO_SERVIDOR + "api/categoriaproduto")
+    async function remover() {
+
+        await axios.delete("http://localhost:8082/api/categoriaproduto/" + idRemover)
+        .then((response) => {
+    
+            setOpenModal(false)
+            console.log('Categoria de produto removida com sucesso.')
+    
+            axios.get("http://localhost:8082/api/categoriaproduto/")
             .then((response) => {
-
-                this.setState({
-                    listaCategoriaProduto: response.data
-                })
+                setLista(response.data)
             })
-
-    };
-
-    remover = async () => {
-
-        await axios.delete(ENDERECO_SERVIDOR + 'api/categoriaproduto/' + this.state.idRemover)
-            .then((response) => {
-
-                this.setState({ openModal: false })
-                console.log('Categoria removido com sucesso.')
-
-                axios.get(ENDERECO_SERVIDOR + "api/categoriaproduto")
-                    .then((response) => {
-
-                        this.setState({
-                            listaCategoriaProduto: response.data
-                        })
-                    })
-            })
-            .catch((error) => {
-                this.setState({ openModal: false })
-                console.log('Erro ao remover um Categoria.')
-            })
-    };
-
-
-    confirmaRemover = (id) => {
-
-        this.setState({
-            openModal: true,
-            idRemover: id
+        })
+        .catch((error) => {
+            setOpenModal(false)
+            console.log('Erro ao remover uma categoria de produto.')
         })
     };
 
-    setOpenModal = (val) => {
+    return(
+        <div>
 
-        this.setState({
-            openModal: val
-        })
+            <div style={{marginTop: '3%'}}>
 
-    };
+                <Container textAlign='justified' >
 
-    render() {
-        return (
-            <>
-                <div>
+                    <h2> Categoria de Produto</h2>
 
-                    <div style={{ marginTop: '3%' }}>
+                    <Divider />
 
-                        <Container textAlign='justified' >
+                    <div style={{marginTop: '4%'}}>
 
-                            <h2> Categoria Produto </h2>
+                        <Button
+                            label='Novo'
+                            circular
+                            color='orange'
+                            icon='clipboard outline'
+                            floated='right'
+                            as={Link} 
+                            to='/form-categoria-produto'
+                        />
 
-                            <Divider />
+                        <br/><br/><br/>
+                    
+                        <Table color='orange' sortable celled>
 
-                            <div style={{ marginTop: '4%' }}>
-                                <Link to={'/form-categoriaproduto'}>
-                                    <Button
-                                        inverted
-                                        circular
-                                        icon
-                                        labelPosition='left'
-                                        color='orange'
-                                        floated='right'
-                                    >
-                                        <Icon name='clipboard outline' />
-                                        Novo
-                                    </Button>
-                                </Link>
-                                <br /><br /><br />
+                            <Table.Header>
+                                <Table.Row>
+                                    <Table.HeaderCell>ID</Table.HeaderCell>
+                                    <Table.HeaderCell>Descrição</Table.HeaderCell>
+                                    <Table.HeaderCell textAlign='center' width={2}>Ações</Table.HeaderCell>
+                                </Table.Row>
+                            </Table.Header>
+                        
+                            <Table.Body>
 
-                                <Table color='orange' sortable celled>
+                                { lista !== undefined && lista.map(categprod => (
 
-                                    <Table.Header>
-                                        <Table.Row>
-                                            <Table.HeaderCell>Descrição</Table.HeaderCell>
-                                            <Table.HeaderCell textAlign='center' width={2}>Ações</Table.HeaderCell>
-                                        </Table.Row>
-                                    </Table.Header>
+                                    <Table.Row key={categprod.id}>
+                                        <Table.Cell>{categprod.id}</Table.Cell>
+                                        <Table.Cell>{categprod.descricao}</Table.Cell>
+                                        <Table.Cell textAlign='center'>
+                                            
+                                            <Button
+                                                inverted
+                                                circular
+                                                color='blue'
+                                                title='Clique aqui para editar os dados desta categoria'
+                                                icon> 
+                                                    <Link to="/form-categoria-produto" state={{id: categprod.id}} style={{color: 'blue'}}> <Icon name='edit' /> </Link>
+                                            </Button> &nbsp;
 
-                                    <Table.Body>
+                                            <Button
+                                                inverted
+                                                circular
+                                                color='red'
+                                                title='Clique aqui para remover esta categoria'
+                                                icon
+                                                onClick={e => confirmaRemover(categprod.id)}> 
+                                                    <Icon name='trash' />
+                                            </Button>
 
-                                        {this.state.listaCategoriaProduto.map(categoriaProduto => (
+                                        </Table.Cell>
+                                    </Table.Row>
+                                ))}
 
-                                            <Table.Row key={categoriaProduto.id}>
-                                                <Table.Cell>{categoriaProduto.descricao}</Table.Cell>
-                                                <Table.Cell textAlign='center'>
-
-                                                    <Button
-                                                        inverted
-                                                        as={Link}
-                                                        to='/form-categoriaproduto' state={{ id: categoriaProduto.id }}
-                                                        circular
-                                                        icon='edit'
-                                                        color='blue'
-                                                        itle='Clique aqui para editar os dados desta categoria' /> &nbsp;
-                                                    <Button
-                                                        onClick={e => this.confirmaRemover(categoriaProduto.id)}
-                                                        inverted
-                                                        circular
-                                                        icon='trash'
-                                                        color='red'
-                                                        title='Clique aqui para remover este categoria' />
-
-                                                </Table.Cell>
-                                            </Table.Row>
-                                        ))}
-
-                                    </Table.Body>
-                                </Table>
-                            </div>
-                        </Container>
+                            </Table.Body>
+                        </Table>
                     </div>
-                </div>
+                </Container>
+            </div>
 
-                <Modal
+            <Modal
                     basic
-                    onClose={() => this.setOpenModal(false)}
-                    onOpen={() => this.setOpenModal(true)}
-                    open={this.state.openModal}
+                    onClose={() => setOpenModal(false)}
+                    onOpen={() => setOpenModal(true)}
+                    open={openModal}
                 >
-                    <Header icon>
-                        <Icon name='trash' />
-                        <div style={{ marginTop: '5%' }}> Tem certeza que deseja remover esse registro? </div>
-                    </Header>
-                    <Modal.Actions>
-                        <Button basic color='red' inverted onClick={() => this.setOpenModal(false)}>
-                            <Icon name='remove' /> Não
-                        </Button>
-                        <Button color='green' inverted onClick={() => this.remover()}>
-                            <Icon name='checkmark' /> Sim
-                        </Button>
-                    </Modal.Actions>
-                </Modal>
+                <Header icon>
+                    <Icon name='trash' />
+                    <div style={{marginTop: '5%'}}> Tem certeza que deseja remover esse registro? </div>
+                </Header>
+                <Modal.Actions>
+                    <Button basic color='red' inverted onClick={() => setOpenModal(false)}>
+                    <Icon name='remove' /> Não
+                    </Button>
+                    <Button color='green' inverted onClick={() => remover()}>
+                    <Icon name='checkmark' /> Sim
+                    </Button>
+                </Modal.Actions>
+            </Modal>
 
-            </>
-        )
-    }
+        </div>
+    )
 }
-
-export default ListCategoriaProduto;
