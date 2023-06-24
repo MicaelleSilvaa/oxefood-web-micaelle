@@ -20,7 +20,7 @@ export default function FormCliente () {
 		
 		if (state != null && state.id != null) {
 
-			axios.get(ENDERECO_SERVIDOR + '/api/cliente/'+state.id)
+			axios.get(ENDERECO_SERVIDOR + 'api/cliente/'+state.id)
 			.then((response) => {
 
 				console.log('response.data.nome: ',response.data.nome)
@@ -63,13 +63,13 @@ export default function FormCliente () {
 
 		if (idCliente != null) { //Alteração:
 
-			axios.put(ENDERECO_SERVIDOR + "/api/cliente/" + idCliente, clienteRequest)
+			axios.put(ENDERECO_SERVIDOR + "api/cliente/" + idCliente, clienteRequest)
 			.then((response) => { console.log('Cliente alterado com sucesso.') })
 			.catch((error) => { console.log('Erro ao alter um cliente.') })
 			
 		} else { //Cadastro:
 
-			axios.post(ENDERECO_SERVIDOR + "/api/cliente", clienteRequest)
+			axios.post(ENDERECO_SERVIDOR + "api/cliente", clienteRequest)
 			.then((response) => { console.log('Cliente cadastrado com sucesso.') })
 			.catch((error) => { console.log('Erro ao incluir o cliente.') })
 		}
@@ -158,6 +158,7 @@ export default function FormCliente () {
 								</Form.Input>
 
 							</Form.Group>
+							
 
 							<Form.Group widths='equal' style={{marginTop: '4%'}}  className='form--empresa-salvar'>
 

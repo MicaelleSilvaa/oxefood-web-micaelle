@@ -23,7 +23,7 @@ export default function FormMaterial() {
 
 		if (state != null && state.id != null) {
 
-			axios.get(ENDERECO_SERVIDOR + '/api/material/' + state.id)
+			axios.get(ENDERECO_SERVIDOR + 'api/material' + state.id)
 				.then((response) => {
 
 					console.log('response.data.nome: ', response.data.nome)
@@ -67,13 +67,13 @@ export default function FormMaterial() {
 
 		if (idMaterial != null) { //Alteração:
 
-			axios.put(ENDERECO_SERVIDOR + "/api/material/" + idMaterial, materialRequest)
+			axios.put(ENDERECO_SERVIDOR + "api/material/" + idMaterial, materialRequest)
 				.then((response) => { console.log('Material alterado com sucesso.') })
 				.catch((error) => { console.log('Erro ao alter um material.') })
 
 		} else { //Cadastro:
 
-			axios.post(ENDERECO_SERVIDOR + "/api/material", materialRequest)
+			axios.post(ENDERECO_SERVIDOR + "api/material", materialRequest)
 				.then((response) => { console.log('Material cadastrado com sucesso.') })
 				.catch((error) => { console.log('Erro ao incluir o material.') })
 		}
