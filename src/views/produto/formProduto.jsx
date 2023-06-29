@@ -1,221 +1,215 @@
+import axios from 'axios';
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import InputMask from 'react-input-mask';
 import { Link, useLocation } from "react-router-dom";
-import { Button, Container, Divider, Form, Icon, Message } from 'semantic-ui-react';
+import { Button, Container, Divider, Form, Icon } from 'semantic-ui-react';
 import { ENDERECO_SERVIDOR } from '../../util/Constantes';
 
-export default function FormProduto() {
+export default function FormProduto () {
 
-    const { state } = useLocation();
+	const { state } = useLocation();
 
-    const [idProduto, setIdProduto] = useState();
-    const [codigo, setCodigo] = useState();
-    const [titulo, setTitulo] = useState();
-    const [descricao, setDescricao] = useState();
-    const [valorUnitario, setValorUnitario] = useState();
-    const [tempoEntregaMinimo, setTempoEntregaMinimo] = useState();
-    const [tempoEntregaMaximo, setTempoEntregaMaximo] = useState();
-    const [listaCategoria, setListaCategoria] = useState([]);
-    const [idCategoria, setIdCategoria] = useState();
+	const [idProduto, setIdProduto] = useState();
+	const [codigo, setCodigo] = useState();
+	const [titulo, setTitulo] = useState();
+	const [descricao, setDescricao] = useState();
+	const [valorUnitario, setValorUnitario] = useState();
+	const [tempoEntregaMinimo, setTempoEntregaMinimo] = useState();
+	const [tempoEntregaMaximo, setTempoEntregaMaximo] = useState();
+	const [listaCategoria, setListaCategoria] = useState([]);
+   	const [idCategoria, setIdCategoria] = useState();
 
 
-    function salvar() {
+	useEffect(() => {
 
-        let produtoRequest = {
+		if (state != null && state.id != null) {
 
-            idCategoria: idCategoria,
-            codigo: codigo,
-            titulo: titulo,
-            descricao: descricao,
-            valorUnitario: valorUnitario,
-            tempoEntregaMinimo: tempoEntregaMinimo,
-            tempoEntregaMaximo: tempoEntregaMaximo
-        }
+			axios.get(ENDERECO_SERVIDOR + "/api/produto/" + state.id)
 
-        if (idProduto != null) { //Atualizar:
-            axios.put(ENDERECO_SERVIDOR + "api/produto/" + idProduto, produtoRequest)
-                .then((response) => { console.log('Produto alterado com sucesso.') })
-                .catch((error) => { console.log('Erro ao alter um produto.') })
-        } else { //Cadastro:
-            axios.post(ENDERECO_SERVIDOR + "api/produto", produtoRequest)
-                .then((response) => { console.log('Produto cadastrado com sucesso.') })
-                .catch((error) => { console.log('Erro ao incluir o produto.') })
-        }
-    }
+			.then((response) => {
+				setIdProduto(response.data.id)
+				setCodigo(response.data.codigo)
+				setTitulo(response.data.titulo)
+				setDescricao(response.data.descricao)
+				setValorUnitario(response.data.valorUnitario)
+				setTempoEntregaMinimo(response.data.tempoEntregaMinimo)
+				setTempoEntregaMaximo(response.data.tempoEntregaMaximo)
+			})
+		}
 
-    useEffect(() => {
-        if (state != null && state.id != null) {
-            axios.get(ENDERECO_SERVIDOR + "api/produto/" + state.id)
-                .then((response) => {
-                    setIdProduto(response.data.id)
-                    setCodigo(response.data.codigo)
-                    setTitulo(response.data.titulo)
-                    setDescricao(response.data.descricao)
-                    setValorUnitario(response.data.valorUnitario)
-                    setTempoEntregaMinimo(response.data.tempoEntregaMinimo)
-                    setTempoEntregaMaximo(response.data.tempoEntregaMaximo)
-                    setIdCategoria(response.data.categoria.id)
-                })
-        }
+		axios.get(ENDERECO_SERVIDOR + "/api/categoriaproduto")
+		.then((response) => {
 
-        axios.get(ENDERECO_SERVIDOR + "api/categoriaproduto")
-       .then((response) => {
-           const dropDownCategorias = response.data.map(c => ({ text: c.descricao, value: c.id }))
-           setListaCategoria(dropDownCategorias);
-       })
+			const dropDownCategorias = response.data.map(c => ({ 
+				text: c.descricao, 
+				value: c.id 
+			}));
+			
+			setListaCategoria(dropDownCategorias);
+		})
+	   
+	}, [state])
 
-    }, [state])
+	function salvar() {
 
-    return (
-        <div>
+		let produtoRequest = {
 
-            <div style={{ marginTop: '3%' }}>
+			idCategoria: idCategoria,
+			codigo: codigo,
+			titulo: titulo,
+			descricao: descricao,
+			valorUnitario: valorUnitario,
+			tempoEntregaMinimo: tempoEntregaMinimo,
+			tempoEntregaMaximo: tempoEntregaMaximo
+		}
 
-                <Container textAlign='justified' >
+		if (idProduto != null) { //Alteração:
 
-                    {idProduto === undefined &&
-                        <h2> <span style={{ color: 'darkgray' }}> Produto &nbsp;<Icon name='angle double right' size="small" /> </span> Cadastro</h2>
-                    }
-                    {idProduto != undefined &&
-                        <h2> <span style={{ color: 'darkgray' }}> Produto &nbsp;<Icon name='angle double right' size="small" /> </span> Alteração</h2>
-                    }
+			axios.put(ENDERECO_SERVIDOR + "/api/produto/" + idProduto, produtoRequest)
+			.then((response) => { console.log('Produto alterado com sucesso.') })
+			.catch((error) => { console.log('Erro ao alterar um produto.') })
 
-                    <Divider />
+		} else { //Cadastro:
 
-                    <div style={{ marginTop: '4%' }}>
+			axios.post(ENDERECO_SERVIDOR + "/api/produto", produtoRequest)
+			.then((response) => { console.log('Produto cadastrado com sucesso.') })
+			.catch((error) => { console.log('Erro ao incluir o produto.') })
+		}
+	}
 
-                        <Form>
+	return(
+		<div>
 
-                            <Form.Group widths='equal'>
-						
-                                <Form.Input
-                                    required
-                                    fluid
-                                    label='Título'
-                                    maxLength="100"
-                                    value={titulo}
-                                    onChange={e => setTitulo(e.target.value)}
-                                />
+			<div style={{marginTop: '3%'}}>
 
-                                <Form.Input
-                                    required
-                                    fluid
-                                    placeholder='Informe o código do produto'
-                                    width={6}
-                                    label='Código do Produto'
-                                    value={codigo}
-                                    onChange={e => setCodigo(e.target.value)}
-                                >
-                                </Form.Input>
+				<Container textAlign='justified' >
 
-                            </Form.Group>
+					{ idProduto === undefined &&
+						<h2> <span style={{color: 'darkgray'}}> Produto &nbsp;<Icon name='angle double right' size="small" /> </span> Cadastro</h2>
+					}
+					{ idProduto != undefined &&
+						<h2> <span style={{color: 'darkgray'}}> Produto &nbsp;<Icon name='angle double right' size="small" /> </span> Alteração</h2>
+					}
 
-                            <Form.Group widths='equal'>
+					<Divider />
 
-                                <Form.Select
-                                    required
-                                    fluid
-                                    tabIndex='3'
-                                    placeholder='Selecione'
-                                    label='Categoria'
-                                    options={listaCategoria}
-                                    value={idCategoria}
-                                    onChange={(e,{value}) => {
-                                        setIdCategoria(value)
-                                    }}                                
-                                />
-                            </Form.Group>
+					<div style={{marginTop: '4%'}}>
 
-                            <Form.Group>
+						<Form>
 
-                                <Form.TextArea
-                                    fluid
-                                    label='Descrição'
-                                    width={16}
-                                    placeholder='Informe a descrição do produto'
-                                    value={descricao}
-                                    onChange={e => setDescricao(e.target.value)}
-                                />
+							<Form.Group>
+								<Form.Input
+									required
+									label='Título'
+									placeholder='Informe o título do produto'
+									tabIndex='1'
+									width={11}
+									maxLength="300"
+									value={titulo}
+									onChange={e => setTitulo(e.target.value)}
+								/>
 
-                            </Form.Group>
+								<Form.Input
+									required
+									fluid
+									label='Código do Produto'
+									placeholder='Informe o código do produto'
+									width={5}
+									tabIndex='2'
+									maxLength='10'
+									value={codigo}
+									onChange={e => setCodigo(e.target.value)}
+								/>
+							</Form.Group>
 
-                            <Form.Group>
+							<Form.Select
+								required
+								fluid
+								tabIndex='3'
+								placeholder='Selecione'
+								label='Categoria'
+								options={listaCategoria}
+								value={idCategoria}
+								onChange={(e,{value}) => {
+									setIdCategoria(value)
+								}}
+							/>
 
-                                <Form.Input
-                                    required
-                                    fluid
-                                    label='Valor Unitário'
-                                    width={6}
-                                    value={valorUnitario}
-                                    onChange={e => setValorUnitario(e.target.value)}
-                                >
+							<Form.TextArea
+								label='Descrição'
+								placeholder='Informe a descrição do produto'
+								tabIndex='3'
+								maxLength="100000"
+								value={descricao}
+								onChange={e => setDescricao(e.target.value)}
+							/>
 
-                                </Form.Input>
+							<Form.Group>
 
-                                <Form.Input
-                                    fluid
-                                    placeholder='30'
-                                    label='Tempo de Entrega Minimo em Minutos'
-                                    width={6}
-                                    value={tempoEntregaMinimo}
-                                    onChange={e => setTempoEntregaMinimo(e.target.value)}
-                                >
-                                </Form.Input>
+								<Form.Input
+									required
+									fluid
+									label='Valor Unitário'
+									tabIndex='5'
+									name='valorUnitario'
+									width={6}
+									value={valorUnitario}
+									onChange={e => setValorUnitario(e.target.value)}
+								/>
+								
+								<Form.Input
+									fluid
+									placeholder='30'
+									label='Tempo de Entrega Mínimo em Minutos'
+									width={5}
+									maxLength="3"
+									value={tempoEntregaMinimo}
+									onChange={e => setTempoEntregaMinimo(e.target.value)}
+								/>
+								
+								<Form.Input
+									fluid
+									placeholder='40'
+									label='Tempo de Entrega Máximo em Minutos'
+									width={5}
+									maxLength="3"
+									value={tempoEntregaMaximo}
+									onChange={e => setTempoEntregaMaximo(e.target.value)}
+								/>
+							</Form.Group>
 
-                                <Form.Input
-                                    fluid
-                                    placeholder='40'
-                                    label='Tempo de Entrega Máximo em Minutos'
-                                    width={6}
-                                    value={tempoEntregaMaximo}
-                                    onChange={e => setTempoEntregaMaximo(e.target.value)}
-                                >
-                                </Form.Input>
+							<Form.Group widths='equal' style={{marginTop: '4%', justifyContent:'space-between'}}>
 
-                            </Form.Group>
+								<Button
+									type="button"
+									inverted
+									circular
+									icon
+									labelPosition='left'
+									color='orange'
+									>
+									<Icon name='reply' />
+									<Link to={'/list-produto'}>Voltar</Link>
+								</Button>
 
-                            <Form.Group widths='equal' style={{ marginTop: '4%' }} className='form--empresa-salvar'>
+								<Button
+									inverted
+									circular
+									icon
+									labelPosition='left'
+									primary
+									floated='right'
+									onClick={() => salvar()}
+									tabIndex='8'>
+									<Icon name='save' />
+									Salvar
+								</Button>
 
-                                <Container textAlign='left'>
-                                    <Button
-                                        type="button"
-                                        inverted
-                                        as={Link}
-                                        to='/list-produto'
-                                        circular
-                                        icon
-                                        labelPosition='left'
-                                        color='orange'
-                                    >
-                                        <Icon name='reply' />
-                                        Voltar
-                                    </Button>
-                                </Container>
+							</Form.Group>
 
-                                <Container textAlign='right'>
-
-                                    <Button
-                                        inverted
-                                        circular
-                                        icon
-                                        labelPosition='left'
-                                        color='blue'
-                                        floated='right'
-                                        onClick={() => salvar()}
-                                    >
-                                        <Icon name='save' />
-                                        Salvar
-                                    </Button>
-
-                                </Container>
-
-                            </Form.Group>
-
-                        </Form>
-                    </div>
-                </Container>
-            </div>
-        </div>
-    )
-};
+						</Form>
+					</div>
+				</Container>
+			</div>
+		</div>
+	)
+}

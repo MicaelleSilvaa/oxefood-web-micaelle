@@ -1,66 +1,34 @@
 import axios from 'axios';
 import React from "react";
 import { Link } from "react-router-dom";
-import { Button, Container, Divider, Icon, Table, Modal, Header } from 'semantic-ui-react';
+import { Button, Container, Divider, Header, Icon, Modal, Table } from 'semantic-ui-react';
 import { ENDERECO_SERVIDOR } from '../../util/Constantes';
 
-class ListProduto extends React.Component {
+class ListProduto extends React.Component{
 
     state = {
+
+        listaProdutos: [],
         openModal: false,
         idRemover: null,
-        listaProdutos: []
-
     }
 
     componentDidMount = () => {
+      
         this.carregarLista();
-
+      
     }
+
     carregarLista = () => {
 
-        axios.get(ENDERECO_SERVIDOR + "api/produto")
-            .then((response) => {
-                this.setState({
-                    listaProdutos: response.data
-                })
-            }).catch(()=> console.log("falha ao carregar"));
-
-    };
-
-    remover = async () => {
-
-        await axios.delete(ENDERECO_SERVIDOR + 'api/produto/' + this.state.idRemover)
-            .then((response) => {
-
-                this.setState({ openModal: false })
-                console.log('Produto removido com sucesso.')
-
-                axios.get(ENDERECO_SERVIDOR + "api/produto")
-                    .then((response) => {
-                        this.setState({
-                            listaProdutos: response.data
-                        })
-                    })
+        axios.get(ENDERECO_SERVIDOR + "/api/produto")
+        .then((response) => {
+          
+            this.setState({
+                listaProdutos: response.data
             })
-            .catch((error) => {
-                this.setState({ openModal: false })
-                console.log('Erro ao remover um produto.')
-            })
-    };
+        })
 
-    formatarData = (dataParam) => {
-
-        if (dataParam === null || dataParam === '') {
-            return ''
-        }
-
-        let dia = dataParam.substr(8, 2);
-        let mes = dataParam.substr(5, 2);
-        let ano = dataParam.substr(0, 4);
-        let dataFormatada = dia + '/' + mes + '/' + ano;
-
-        return dataFormatada
     };
 
     confirmaRemover = (id) => {
@@ -68,126 +36,145 @@ class ListProduto extends React.Component {
         this.setState({
             openModal: true,
             idRemover: id
-        })
-    };
+        })  
+    }
 
     setOpenModal = (val) => {
 
         this.setState({
             openModal: val
         })
-
+   
     };
 
-    render() {
-        return (
-            <>
-                <div>
+    remover = async () => {
 
-                    <div style={{ marginTop: '3%' }}>
+        await axios.delete(ENDERECO_SERVIDOR + '/api/produto/' + this.state.idRemover)
+        .then((response) => {
+   
+            this.setState({ openModal: false })
+            console.log('Produto removido com sucesso.')
+   
+            axios.get(ENDERECO_SERVIDOR + "/api/produto")
+            .then((response) => {
+           
+                this.setState({
+                    listaProdutos: response.data
+                })
+            })
+        })
+        .catch((error) => {
+            this.setState({  openModal: false })
+            console.log('Erro ao remover um produto.')
+        })
+    };
 
-                        <Container textAlign='justified' >
+    render(){
+        return(
+            <div>
 
-                            <h2> Produto </h2>
+                <div style={{marginTop: '3%'}}>
 
-                            <Divider />
+                    <Container textAlign='justified' >
 
-                            <div style={{ marginTop: '4%' }}>
-                                <Link to={'/form-produto'}>
-                                    <Button
-                                        inverted
-                                        circular
-                                        icon
-                                        labelPosition='left'
-                                        color='orange'
-                                        floated='right'
-                                    >
-                                        <Icon name='clipboard outline' />
-                                        Novo
-                                    </Button>
-                                </Link>
-                                <br /><br /><br />
+                        <h2> Produto </h2>
 
-                                <Table color='orange' sortable celled>
+                        <Divider />
 
-                                    <Table.Header>
-                                        <Table.Row>
-                                            <Table.HeaderCell>Código</Table.HeaderCell>
-                                            <Table.HeaderCell>Categoria</Table.HeaderCell>
-                                            <Table.HeaderCell>Título</Table.HeaderCell>
-                                            <Table.HeaderCell>Descrição</Table.HeaderCell>
-                                            <Table.HeaderCell>Valor Unitário</Table.HeaderCell>
-                                            <Table.HeaderCell>Tempo de Entrega Minino</Table.HeaderCell>
-                                            <Table.HeaderCell>Tempo de Entrega Máximo</Table.HeaderCell>
-                                            <Table.HeaderCell textAlign='center' width={2}>Ações</Table.HeaderCell>
-                                        </Table.Row>
-                                    </Table.Header>
+                        <div style={{marginTop: '4%'}}>
 
-                                    <Table.Body>
+                            <Button
+                                inverted
+                                circular
+                                icon
+                                labelPosition='left'
+                                color='orange'
+                                floated='right'
+                            >
+                                <Icon name='clipboard outline' />
+                                <Link to={'/form-produto'}>Novo</Link>
+                            </Button>
 
-                                        {this.state.listaProdutos.map(produto => (
+                            <br/><br/><br/>
+                      
+                            <Table color='orange' sortable celled>
 
-                                            <Table.Row key={produto.id}>
-                                                <Table.Cell>{produto.codigo}</Table.Cell>
-                                                <Table.Cell>{produto?.descricao}</Table.Cell>
-                                                <Table.Cell>{produto.titulo}</Table.Cell>
-                                                <Table.Cell>{produto.categoria?.descricao}</Table.Cell>
-                                                <Table.Cell>{produto.valorUnitario}</Table.Cell>
-                                                <Table.Cell>{produto.tempoEntregaMinimo}</Table.Cell>
-                                                <Table.Cell>{produto.tempoEntregaMaximo}</Table.Cell>
+                                <Table.Header>
+                                    <Table.Row>
+                                        <Table.HeaderCell>Código</Table.HeaderCell>
+                                        <Table.HeaderCell>Categoria</Table.HeaderCell>
+                                        <Table.HeaderCell>Título</Table.HeaderCell>
+                                        <Table.HeaderCell>Descrição</Table.HeaderCell>
+                                        <Table.HeaderCell>Valor Unitário</Table.HeaderCell>
+                                        <Table.HeaderCell>Tempo Mínimo de Entrega</Table.HeaderCell>
+                                        <Table.HeaderCell>Tempo Máximo de Entrega</Table.HeaderCell>
+                                        <Table.HeaderCell textAlign='center' width={2}>Ações</Table.HeaderCell>
+                                    </Table.Row>
+                                </Table.Header>
+                          
+                                <Table.Body>
 
-                                                <Table.Cell textAlign='center'>
+                                    { this.state.listaProdutos.map(p => (
 
-                                                    <Button
-                                                        inverted
-                                                        as={Link}
-                                                        to='/form-produto' state={{ id: produto.id }}
-                                                        circular
-                                                        icon='edit'
-                                                        color='blue'
-                                                        itle='Clique aqui para editar os dados deste produto' /> &nbsp;
-                                                    <Button
-                                                        onClick={e => this.confirmaRemover(produto.id)}
-                                                        inverted
-                                                        circular
-                                                        icon='trash'
-                                                        color='red'
-                                                        title='Clique aqui para remover este produto' />
+                                        <Table.Row key={p.id}>
+                                            <Table.Cell>{p.codigo}</Table.Cell>
+                                            <Table.Cell>{p.categoria.descricao}</Table.Cell>
+                                            <Table.Cell>{p.titulo}</Table.Cell>
+                                            <Table.Cell>{p.descricao}</Table.Cell>
+                                            <Table.Cell>{p.valorUnitario}</Table.Cell>
+                                            <Table.Cell>{p.tempoEntregaMinimo}</Table.Cell>
+                                            <Table.Cell>{p.tempoEntregaMaximo}</Table.Cell>
+                                            <Table.Cell textAlign='center'>
+                                              
+                                            <Button
+                                                inverted
+                                                circular
+                                                color='green'
+                                                title='Clique aqui para editar os dados deste cliente'
+                                                icon>
+                                                    <Link to="/form-produto" state={{id: p.id}} style={{color: 'green'}}> <Icon name='edit' /> </Link>
+                                            </Button> &nbsp;
+                                                
+                                                <Button
+                                                   inverted
+                                                   circular
+                                                   icon='trash'
+                                                   color='red'
+                                                   title='Clique aqui para remover este cliente' 
+                                                   onClick={e => this.confirmaRemover(p.id)} />
 
-                                                </Table.Cell>
-                                            </Table.Row>
-                                        ))}
+                                            </Table.Cell>
+                                       </Table.Row>
+                                   ))}
 
-                                    </Table.Body>
-                                </Table>
-                            </div>
-                        </Container>
-                    </div>
-                </div>
+                               </Table.Body>
+                           </Table>
+                       </div>
+                   </Container>
+               </div>
 
-                <Modal
+               <Modal
                     basic
                     onClose={() => this.setOpenModal(false)}
                     onOpen={() => this.setOpenModal(true)}
                     open={this.state.openModal}
                 >
                     <Header icon>
-                        <Icon name='trash' />
-                        <div style={{ marginTop: '5%' }}> Tem certeza que deseja remover esse registro? </div>
+                            <Icon name='trash' />
+                            <div style={{marginTop: '5%'}}> Tem certeza que deseja remover esse registro? </div>
                     </Header>
                     <Modal.Actions>
-                        <Button basic color='red' inverted onClick={() => this.setOpenModal(false)}>
-                            <Icon name='remove' /> Não
-                        </Button>
-                        <Button color='green' inverted onClick={() => this.remover()}>
-                            <Icon name='checkmark' /> Sim
-                        </Button>
+                            <Button basic color='red' inverted onClick={() => this.setOpenModal(false)}>
+                                <Icon name='remove' /> Não
+                            </Button>
+                            <Button color='green' inverted onClick={() => this.remover()}>
+                                <Icon name='checkmark' /> Sim
+                            </Button>
                     </Modal.Actions>
                 </Modal>
-
-            </>
-        )
-    }
+                
+           </div>
+       )
+   }
 }
-
 export default ListProduto;

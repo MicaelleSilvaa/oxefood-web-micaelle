@@ -3,14 +3,14 @@ import { Route, Routes } from "react-router-dom";
 
 import FormCategoriaProduto from './views/categoriaProduto/FormCategoriaProduto';
 import ListCategoriaProduto from './views/categoriaProduto/ListCategoriaProduto';
-import FormCliente from './views/cliente/FormCliente';
-import ListCliente from './views/cliente/ListCliente';
+import FormCliente from './views/cliente/formCliente';
+import ListCliente from './views/cliente/listCliente';
 import FormEntregador from './views/entregador/FormEntregador';
 import ListEntregador from './views/entregador/ListEntregador';
 import Home from './views/home/Home';
 import FormMaterial from './views/material/FormMaterial';
 import ListMaterial from './views/material/ListMaterial';
-import FormProduto from './views/produto/FormProduto';
+import FormProduto from './views/produto/formProduto';
 import ListProduto from './views/produto/ListProduto';
 
 
